@@ -330,3 +330,28 @@ textarea#clientText {
 .clear-history:hover {
   background-color: #d32f2f;
 }
+
+/* кнопка авито */
+.avito-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #4c6ef5;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.avito-button:hover {
+  background-color: #3f5fd1;
+}
+
+.avito-icon {
+  width: 20px;
+  height: 20px;
+}

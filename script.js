@@ -295,26 +295,17 @@ window.addEventListener("click", (e) => {
 copyAndGoAvitoBtn.addEventListener("click", () => {
   const message = document.getElementById("clientText").value.trim();
 
-  if (!navigator.clipboard) {
-    alert("Браузер не поддерживает копирование");
-    return;
-  }
-
   navigator.clipboard.writeText(message).then(() => {
-    // Открываем Авито через официальный сайт (чтобы не было ошибки)
-    window.location.href = "https://www.avito.ru/";
+    // Только после успешного копирования — открываем
+    const newWindow = window.open("https://m.avito.ru/", "_blank");
+
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      alert("Не удалось открыть Авито. Разрешите всплывающие окна в браузере.");
+    }
   }).catch(() => {
     alert("Не удалось скопировать сообщение");
   });
 });
-
-function openAvitoModal() {
-  document.getElementById("avitoModal").style.display = "block";
-}
-
-function closeAvitoModal() {
-  document.getElementById("avitoModal").style.display = "none";
-}
 
 //создать студ фэк
 const fakeModal = document.getElementById("fakeModal");

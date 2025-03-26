@@ -296,17 +296,25 @@ copyAndGoAvitoBtn.addEventListener("click", () => {
   const message = document.getElementById("clientText").value.trim();
 
   if (!navigator.clipboard) {
-    alert("Ваш браузер не поддерживает копирование. Скопируйте вручную.");
+    alert("Браузер не поддерживает копирование");
     return;
   }
 
   navigator.clipboard.writeText(message).then(() => {
-    // Открываем приложение Авито
-    window.location.href = "avito://";
+    // Открываем Авито через официальный сайт (чтобы не было ошибки)
+    window.location.href = "https://www.avito.ru/";
   }).catch(() => {
     alert("Не удалось скопировать сообщение");
   });
 });
+
+function openAvitoModal() {
+  document.getElementById("avitoModal").style.display = "block";
+}
+
+function closeAvitoModal() {
+  document.getElementById("avitoModal").style.display = "none";
+}
 
 //создать студ фэк
 const fakeModal = document.getElementById("fakeModal");

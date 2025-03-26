@@ -295,13 +295,14 @@ window.addEventListener("click", (e) => {
 copyAndGoAvitoBtn.addEventListener("click", () => {
   const message = document.getElementById("clientText").value.trim();
 
-  navigator.clipboard.writeText(message).then(() => {
-    // Только после успешного копирования — открываем
-    window.location.href = "avito://";
+  if (!navigator.clipboard) {
+    alert("Ваш браузер не поддерживает копирование. Скопируйте вручную.");
+    return;
+  }
 
-    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-      alert("Не удалось открыть Авито. Разрешите всплывающие окна в браузере.");
-    }
+  navigator.clipboard.writeText(message).then(() => {
+    // Открываем приложение Авито
+    window.location.href = "avito://";
   }).catch(() => {
     alert("Не удалось скопировать сообщение");
   });

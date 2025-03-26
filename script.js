@@ -1,5 +1,4 @@
-
-  let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
 
   function saveToLocal() {
     localStorage.setItem('accounts', JSON.stringify(accounts));
@@ -110,7 +109,7 @@ document.getElementById('counter').innerText = `Всего: ${total} | Акти�
 
  //генератор паролей
  // генерация пароля
-function generatePassword(length = 12) {
+function generatePassword(length = 16) {
   const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
   let password = "";
   for (let i = 0; i < length; i++) {
@@ -142,11 +141,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Закрытие меню при клике вне его области
   document.addEventListener("click", function (event) {
-    if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
-      sidebar.classList.remove("active");
-      menuButton.classList.remove("open");
-    }
-  });
+  const isClickInsideSidebar = sidebar.contains(event.target);
+  const isClickOnMenuButton = menuButton.contains(event.target);
+  const isClickInsideModal = event.target.closest(".modal-content"); // модалки
+
+  if (!isClickInsideSidebar && !isClickOnMenuButton && !isClickInsideModal) {
+    sidebar.classList.remove("active");
+    menuButton.classList.remove("open");
+  }
+});
 });
 
 //клик в меню
@@ -277,7 +280,7 @@ const copyAndGoAvitoBtn = document.getElementById("copyAndGoAvitoBtn");
 // Открытие из меню
 document.getElementById("openAvito").addEventListener("click", () => {
   avitoModal.style.display = "block";
-  closeMenu();
+  //closeMenu();
 });
 
 // Закрытие модалки
@@ -297,7 +300,7 @@ copyAndGoAvitoBtn.addEventListener("click", () => {
 
   navigator.clipboard.writeText(message).then(() => {
     // Только после успешного копирования — открываем
-    const newWindow = window.open("https://m.avito.ru/", "_blank");
+    const newWindow = window.open("avito://", "_blank");
 
     if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
       alert("Не удалось открыть Авито. Разрешите всплывающие окна в браузере.");
@@ -308,146 +311,128 @@ copyAndGoAvitoBtn.addEventListener("click", () => {
 });
 
 //создать студ фэк
-// Модалка генерации
+// ======= МОДАЛКА генерации студента =======
+// ======= МОДАЛКА генерации студента =======
 const fakeModal = document.getElementById("fakeModal");
-const closeFakeModal = document.getElementById("closeFakeModal");
 const genFakeBtn = document.getElementById("genFakeBtn");
+const fakeStatus = document.getElementById("fakeStatus");
+const closeFakeModal = document.getElementById("closeFakeModal");
 
-// Показ модалки
 document.getElementById("generateFakeStudent").addEventListener("click", () => {
   fakeModal.style.display = "block";
-  closeMenu?.();
+  //closeMenu?.();
 });
-
-// Закрытие
 closeFakeModal.addEventListener("click", () => {
   fakeModal.style.display = "none";
 });
-
-// Генерация с бесконечным поиском нужного возраста
-genFakeBtn.addEventListener("click", async () => {
-  genFakeBtn.disabled = true;
-  genFakeBtn.textContent = "Генерация...";
-
-  let student = null;
-  let tries = 0;
-
-  while (!student && tries < 20) {
-    const res = await fetch("https://randomuser.me/api/?nat=us,gb,ca,nz,au");
-    const data = await res.json();
-    const user = data.results[0];
-    const age = user.dob.age;
-
-    if (age >= 18 && age <= 21) {
-      const first = user.name.first;
-      const last = user.name.last;
-      const login = `${first}${last}`;
-      const password = user.login.password;
-      const email = user.email;
-      const phone = user.phone;
-      const address = `${user.location.street.number} ${user.location.street.name}, ${user.location.city}, ${user.location.state}`;
-      const birthday = new Date(user.dob.date).toLocaleDateString("en-US");
-      const countryCode = user.nat.toLowerCase();
-      const country = getCountryName(user.nat);
-      const flag = `https://flagcdn.com/24x18/${countryCode}.png`;
-
-      student = {
-        id: Date.now(),
-        login,
-        password,
-        active: false,
-        email,
-        phone,
-        address,
-        birthday,
-        country,
-        flag
-      };
-
-      accounts.push(student);
-      saveToLocal();
-      renderTable();
-      addToHistory?.(`🎓 Добавлен студент: ${login} (${country})`);
-      addStudentToHistory(student);
-      fakeModal.style.display = "none";
-    }
-
-    tries++;
-  }
-
-  if (!student) {
-    alert("Не удалось найти подходящего студента. Попробуй позже.");
-  }
-
-  genFakeBtn.disabled = false;
-  genFakeBtn.textContent = "Сгенерировать";
+window.addEventListener("click", (e) => {
+  if (e.target === fakeModal) fakeModal.style.display = "none";
 });
-//ИСТОРИЯ
+
+// ======= ИСТОРИЯ студентов =======
 let studentHistory = JSON.parse(localStorage.getItem("studentHistory")) || [];
 
-function addStudentToHistory(student) {
-  const now = new Date().toLocaleString("ru-RU");
-  const entry = {
-    name: student.login,
-    birthday: student.birthday,
-    email: student.email,
-    phone: student.phone,
-    address: student.address,
-    createdAt: now
-  };
-
-  studentHistory.unshift(entry);
+function saveStudentHistory() {
   localStorage.setItem("studentHistory", JSON.stringify(studentHistory));
-  renderStudentHistory();
 }
 
 function renderStudentHistory() {
   const container = document.getElementById("studentHistoryLog");
   if (!container) return;
-
   container.innerHTML = studentHistory.map(s => `
     <div class="student-entry">
       <b>${s.name}</b> (${s.birthday})<br>
-      Email: ${s.email}<br>
-      Телефон: ${s.phone}<br>
-      Адрес: ${s.address}<br>
+      Email: ${s.email || '-'}<br>
+      Телефон: ${s.phone || '-'}<br>
+      Адрес: ${s.address || '-'}<br>
+      Девичья фамилия матери: ${s.maiden || '-'}<br>
       <i>Создано: ${s.createdAt}</i>
     </div>
-  `).join('');
+  `).join('<hr>');
 }
 
-// Открытие модалки истории
+function addStudentToHistory(student) {
+  const entry = {
+    name: student.name,
+    birthday: student.birthday,
+    email: student.email,
+    phone: student.phone,
+    address: student.address,
+    maiden: student.maiden,
+    createdAt: new Date().toLocaleString("ru-RU")
+  };
+  studentHistory.unshift(entry);
+  saveStudentHistory();
+  renderStudentHistory();
+}
+
+// ======= ГЕНЕРАЦИЯ фейк-студента =======
+genFakeBtn.addEventListener("click", async () => {
+  fakeStatus.textContent = "Генерация...";
+  genFakeBtn.disabled = true;
+
+  try {
+    const rand = Math.random();
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(
+      `https://www.fakenamegenerator.com/advanced.php?t=country&n[]=us&c[]=us&gen=1&age-min=18&age-max=21&rand=${rand}`
+    )}`;
+
+    const res = await fetch(proxyUrl);
+    const data = await res.json();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(data.contents, 'text/html');
+
+    const name = doc.querySelector("h3")?.textContent.trim();
+    const address = doc.querySelector(".adr")?.textContent.trim();
+
+    const getField = (label) => {
+      const dt = Array.from(doc.querySelectorAll("dl dt")).find(dt => dt.textContent.includes(label));
+      return dt ? dt.nextElementSibling?.textContent.trim() : "";
+    };
+
+    const student = {
+      name,
+      address,
+      birthday: getField("Birthday"),
+      email: getField("Email Address"),
+      phone: getField("Phone"),
+      maiden: getField("Mother's maiden name")
+    };
+
+    addStudentToHistory(student);
+    fakeStatus.textContent = "✅ Готово!";
+    fakeModal.style.display = "none";
+  } catch (e) {
+    console.error(e);
+    fakeStatus.textContent = "Ошибка генерации";
+  } finally {
+    genFakeBtn.disabled = false;
+    setTimeout(() => (fakeStatus.textContent = ""), 3000);
+  }
+});
+
+// ======= ИСТОРИЯ модалка =======
+const studentHistoryModal = document.getElementById("studentHistoryModal");
+const closeStudentHistoryModal = document.getElementById("closeStudentHistoryModal");
+
 document.getElementById("openStudentHistory").addEventListener("click", () => {
   renderStudentHistory();
   studentHistoryModal.style.display = "block";
-  closeMenu?.();
+  //closeMenu?.();
 });
-
-// Закрытие
-document.getElementById("closeStudentHistoryModal").addEventListener("click", () => {
+closeStudentHistoryModal.addEventListener("click", () => {
   studentHistoryModal.style.display = "none";
 });
-
 window.addEventListener("click", (e) => {
-  if (e.target === studentHistoryModal) {
-    studentHistoryModal.style.display = "none";
-  }
+  if (e.target === studentHistoryModal) studentHistoryModal.style.display = "none";
 });
 
-// Очистка
+// ======= ОЧИСТКА истории =======
 document.getElementById("clearStudentHistoryBtn").addEventListener("click", () => {
-  const confirmClear = confirm("Удалить всю историю студентов?");
-  if (confirmClear) {
+  if (confirm("Удалить всю историю студентов?")) {
     studentHistory = [];
     localStorage.removeItem("studentHistory");
     renderStudentHistory();
-    addToHistory("🧹 История студентов очищена");
+    addToHistory?.("🧹 История студентов очищена");
   }
 });
-// хуй его знает
-function getCountryName(code) {
-  const countries = {
-    US: "USA", GB: "UK", CA: "Canada", NZ: "New Zealand", AU: "Australia"
-  };
-  return countries[code] || code;
-}

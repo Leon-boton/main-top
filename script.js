@@ -421,7 +421,7 @@ function tryGenerateStudent(retries = 5) {
       const user = data.results[0];
       const age = user.dob.age;
 
-      if (age >= 18 && age <= 21) {
+      if (age >= 18 && age <= 22) {
         const first = user.name.first;
         const last = user.name.last;
         const login = `${first}${last}`;

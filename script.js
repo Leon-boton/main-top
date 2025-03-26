@@ -297,7 +297,7 @@ copyAndGoAvitoBtn.addEventListener("click", () => {
 
   navigator.clipboard.writeText(message).then(() => {
     // Только после успешного копирования — открываем
-    const newWindow = window.open("https://m.avito.ru/messages", "_blank");
+    window.location.href = "avito://";
 
     if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
       alert("Не удалось открыть Авито. Разрешите всплывающие окна в браузере.");

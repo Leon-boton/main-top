@@ -329,7 +329,12 @@ window.addEventListener("click", (e) => {
   }
 });
 
-genFakeBtn.addEventListener("click", () => {
+function tryGenerateStudent(retries = 5) {
+  if (retries <= 0) {
+    alert("Не удалось сгенерировать студента нужного возраста. Попробуй ещё раз.");
+    return;
+  }
+
   fetch('https://randomuser.me/api/')
     .then(res => res.json())
     .then(data => {
@@ -356,20 +361,22 @@ genFakeBtn.addEventListener("click", () => {
         };
 
         accounts.push(newAccount);
-
         saveToLocal();
         renderTable();
         addToHistory(`🎓 Добавлен фейк-студент: ${login}, ${birthday}`);
-addStudentToHistory(newAccount);//нах
+        addStudentToHistory(newAccount);
         fakeModal.style.display = "none";
       } else {
-        genFakeBtn.click(); // пробуем снова
+        setTimeout(() => tryGenerateStudent(retries - 1), 300); // пробуем снова, но с ограничением
       }
     })
     .catch(() => {
       alert("Ошибка генерации студента");
     });
+    genFakeBtn.addEventListener("click", () => {
+  tryGenerateStudent(); // запускаем с 5 попытками
 });
+}
 
 //история студ
 let studentHistory = JSON.parse(localStorage.getItem("studentHistory")) || [];

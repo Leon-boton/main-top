@@ -331,23 +331,28 @@ window.addEventListener("click", (e) => {
 
 function tryGenerateStudent(retries = 5) {
   if (retries <= 0) {
-    alert("Не удалось сгенерировать студента нужного возраста. Попробуй ещё раз.");
+    alert("Не удалось найти подходящего студента. Попробуй позже.");
     return;
   }
 
-  fetch('https://randomuser.me/api/')
+  fetch("https://randomuser.me/api/?nat=us,gb,ca,nz,au")
     .then(res => res.json())
     .then(data => {
       const user = data.results[0];
       const age = user.dob.age;
 
       if (age >= 18 && age <= 21) {
-        const login = `${user.name.first}${user.name.last}`;
+        const first = user.name.first;
+        const last = user.name.last;
+        const login = `${first}${last}`;
         const password = user.login.password;
         const email = user.email;
         const phone = user.phone;
         const address = `${user.location.street.number} ${user.location.street.name}, ${user.location.city}, ${user.location.state}`;
-        const birthday = new Date(user.dob.date).toLocaleDateString("ru-RU");
+        const birthday = new Date(user.dob.date).toLocaleDateString("en-US");
+        const countryCode = user.nat.toLowerCase(); // us, gb и т.д.
+        const country = getCountryName(user.nat);    // Полное название
+        const flag = `https://flagcdn.com/24x18/${countryCode}.png`;
 
         const newAccount = {
           id: Date.now(),
@@ -357,25 +362,34 @@ function tryGenerateStudent(retries = 5) {
           email,
           phone,
           address,
-          birthday
+          birthday,
+          country,
+          flag
         };
 
         accounts.push(newAccount);
         saveToLocal();
         renderTable();
-        addToHistory(`🎓 Добавлен фейк-студент: ${login}, ${birthday}`);
+        addToHistory(`🎓 ${login} (${country}) — ${birthday}`);
         addStudentToHistory(newAccount);
         fakeModal.style.display = "none";
       } else {
-        setTimeout(() => tryGenerateStudent(retries - 1), 300); // пробуем снова, но с ограничением
+        setTimeout(() => tryGenerateStudent(retries - 1), 300);
       }
     })
     .catch(() => {
-      alert("Ошибка генерации студента");
+      alert("Ошибка при получении студента");
     });
-    genFakeBtn.addEventListener("click", () => {
-  tryGenerateStudent(); // запускаем с 5 попытками
-});
+}
+function getCountryName(code) {
+  const map = {
+    US: "USA",
+    GB: "UK",
+    CA: "Canada",
+    NZ: "New Zealand",
+    AU: "Australia"
+  };
+  return map[code] || code;
 }
 
 //история студ
@@ -403,10 +417,11 @@ function renderStudentHistory() {
 
   container.innerHTML = studentHistory.map(s => `
     <div class="student-entry">
-      <b>${s.name}</b> (${s.birthday})<br>
+      <b><img src="${s.flag}" style="vertical-align: middle;"> ${s.login}</b> (${s.birthday})<br>
       Email: ${s.email}<br>
       Телефон: ${s.phone}<br>
       Адрес: ${s.address}<br>
+      Страна: ${s.country}<br>
       <i>Создано: ${s.createdAt}</i>
     </div>
   `).join('');

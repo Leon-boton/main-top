@@ -8,13 +8,9 @@
 <!-- иконки  -->
 <link rel="icon" href="favicon.ico" type="image/x-icon">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css">
-  <!-- PWA и рабочий стол -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#000000">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Контроль">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="style.css">
+ 
 </head>
 <body>
 <h2>КОНТРОЛЬ АККАУНТОВ</h2>
@@ -69,7 +65,40 @@
     <span class="close" id="closeAvitoModal">&times;</span>
     <h3>Сообщение для клиента</h3>
     <textarea id="clientText" readonly>
-Здравствуйте! Интересует ваше объявление на Авито. Напишите, пожалуйста, свободно ли оно и когда удобно связаться.
+По этой инструкции !При активаций для стабильности лучше применить VPN 
+
+П. 1
+— Заходим на iPhone в
+настройки
+Жмем Apple ID, ICloud, контент и покупки
+
+П.2
+— Выбираем подпункт
+Подписки
+
+П.3
+— Выбираем Apple Music и
+жмем см.все планы
+
+П.4
+— Выбираем подписку
+Студенческая
+
+П.5
+— Во вкладке Страна/регион выбираем страну
+! США !
+(в поиске можно по русски набрать штаты)
+
+— Во вкладке Учебное заведение в поиске пишем название университета
+
+KANSAS STATE UNIVERSITY
+
+П.6
+Вас перебросит на сайт
+университета.
+
+Скрин п.6 пункта нужно
+оправить вышлю elD и пароль
     </textarea>
     <button id="copyAndGoAvitoBtn">Скопировать и открыть Авито</button>
   </div>
@@ -86,10 +115,10 @@
 <!-- Модалка фейк-студента -->
 <div id="fakeModal" class="modal">
   <div class="modal-content">
-    <span class="close" id="closeFakeModal">&times;</span>
-    <h3>Добавление фейк-студента</h3>
-    <p>Нажмите кнопку ниже, чтобы сгенерировать случайного студента возрастом от 18 до 21 года.</p>
+    <span id="closeFakeModal" class="close">&times;</span>
+    <h3>Сгенерировать студентов</h3>
     <button id="genFakeBtn">Сгенерировать</button>
+    <p id="fakeStatus" style="margin-top:10px;font-size:14px;color:#555;"></p>
   </div>
 </div>
 <!-- История генерации студентов -->

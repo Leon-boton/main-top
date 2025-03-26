@@ -295,18 +295,14 @@ window.addEventListener("click", (e) => {
 });
 
 // Копировать и открыть Авито
-copyAndGoAvitoBtn.addEventListener("click", () => {
-  const message = document.getElementById("clientText").value.trim();
+document.getElementById("copyAndGoAvitoBtn").addEventListener("click", () => {
+  const message = document.getElementById("clientText")?.value.trim();
+  if (!message) return alert("Введите сообщение для копирования");
 
   navigator.clipboard.writeText(message).then(() => {
-    // Только после успешного копирования — открываем
-    const newWindow = window.open("avito://", "_blank");
-
-    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-      alert("Не удалось открыть Авито. Разрешите всплывающие окна в браузере.");
-    }
+    window.location.href = "https://www.avito.ru/";
   }).catch(() => {
-    alert("Не удалось скопировать сообщение");
+    alert("Не удалось скопировать текст");
   });
 });
 
